@@ -169,6 +169,3 @@ function winner(){
 
 }
 
-//background = (item.r, item.b,)
-
-
