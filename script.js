@@ -21,10 +21,15 @@ var notFoundIt = true;
 var user = {name: null, color: null};
 var bod = document.body;
 var score = 0;
-var q = window, uColor;
+var d = window, uColor;
 var now, dt, last = timestamp();
+var requestId;
 
-requestAnimationFrame = q.requestAnimationFrame || q.webkitRequestAnimationFrame || q.msRequestAnimationFrame || q.mozRequestAnimationFrame;
+requestAnimationFrame =  d.requestAnimationFrame ||
+        d.webkitRequestAnimationFrame ||
+        d.msRequestAnimationFrame ||
+        d.mozRequestAnimationFrame;
+
 
 function init(){
     canvas = document.getElementById('canvas');
@@ -38,27 +43,23 @@ function init(){
     block_x = w / 2 - 15;
     block_y = h /2 - 15;
 
-    requestAnimationFrame(frame);
-}
+    console.log('requesting animation frame');
 
-function run(){
-    value: true
+    startGame();
+    //requestAnimationFrame(frame);
 }
-
 
 function frame() {
-    //if(run.value) {
+    //console.log('generating frame');
         now = timestamp();
         dt = (now - last) / 1000;    // duration in seconds
+    //console.log('i should call draw and update now');
         draw(dt);
+        update(dt);
         last = now;
         requestAnimationFrame(frame);
-    //}
-}
-
-
-function stopGame(){
-    run.value = !run.value;
+    // check to see if it's time to end the game
+    //    stopGame();
 }
 
 function clearCanvas() {
@@ -66,16 +67,47 @@ function clearCanvas() {
 }
 
 function draw() {
+    //console.log('drawing...');
+    //context.fillRect(block_x,block_y,block_w,block_h);
+    context.beginPath();
+    //console.log('generating user');
+    context.arc(block_x, block_y, block_w/3, 0, 2 * Math.PI, false);
+    context.fillStyle="#3D3C3D"; // replace value with user.color;
+    context.fill();
+    context.closePath();
+
+    uLoc = {x: block_x, y: block_y};
+
+    var relay = checkForWin();
+
+    if(relay == false){
+        // If user has found it
+        stopGame();
+        announceWinner();
+        console.log(user + " found the treasure!");
+        ++score;
+        //stopGame();
+        // wait 10 seconds and then reset
+        //setTimeout(reset, 5000);
+    }
+}
+
+function update() {
+    //console.log('updating...');
     if (rightKey) {
+        console.log('moving right...');
         block_x += 5;
     }
     else if (leftKey) {
+        console.log('moving left...');
         block_x -= 5;
     }
     if (upKey) {
+        console.log('moving up...');
         block_y -= 5;
     }
     else if (downKey) {
+        console.log('moving down...');
         block_y += 5;
     }
     if (block_x <= 0) {
@@ -89,27 +121,6 @@ function draw() {
     }
     if ((block_y + block_h) >= h) {
         block_y = h - block_h;
-    }
-
-    //context.fillRect(block_x,block_y,block_w,block_h);
-    context.beginPath();
-    context.arc(block_x, block_y, block_w/3, 0, 2 * Math.PI, false);
-    context.fillStyle="#3D3C3D"; // replace value with user.color;
-    context.fill();
-    context.closePath();
-
-    uLoc = {x: block_x, y: block_y};
-
-    var relay = checkForWin();
-
-    if(relay == false){
-        // If user has found it
-        announceWinner();
-        console.log(user + " found the treasure!");
-        ++score;
-        //stopGame();
-        // wait 10 seconds and then reset
-        setTimeout(reset, 5000);
     }
 }
 
@@ -126,19 +137,19 @@ window.onkeydown = function (evt) {
 
     if (code == 39) {
         rightKey = true;
-        console.log('right');
+        //console.log(rightKey);
     }
     else if (code == 37) {
         leftKey = true;
-        console.log('left');
+        //console.log('left');
     }
     if (code == 38) {
         upKey = true;
-        console.log('up');
+        //console.log('up');
     }
     else if (code == 40) {
         downKey = true;
-        console.log('down');
+        //console.log('down');
     }
 };
 
@@ -152,6 +163,7 @@ window.onkeyup = function (evt) {
 
     if (code == 39) {
         rightKey = false;
+        //console.log('rkey up');
     }
 
     else if (code == 37) {
@@ -215,7 +227,9 @@ function checkForWin(){
 // After game over, server will emit the user to all users. browser will append name to users.
 
 function announceWinner(user){
-    clearCanvas();
+    window.setTimeout(function() {
+        clearCanvas();
+    }, 500);
     //var u = user.name.toString();
     //var u = user.toString();
 
@@ -225,58 +239,70 @@ function announceWinner(user){
     //x.appendChild(t);
     //bod.appendChild(x);
 
-
-        context.font="100px Georgia";
-        context.fillText("Game OVER", ((canvas.height/2) - 40), (canvas.height/2));
-        //context.fillText(" is the checkForWin!");
-
-
+    window.setTimeout(function() {
+        context.font = "30px Georgia";
+        context.fillText("Game OVER", ((canvas.width / 2) - 40), (canvas.height / 2));
+        context.fillText(user + " is the checkForWin!", ((canvas.width / 2)), (canvas.height / 2)+ 40);
+    }, 5000);
 }
 
 function reset(){
     // wait 2 seconds then:
-    window.setTimeout(function() {
+    //window.setTimeout(function() {
         clearCanvas();
+    //window.setTimeout(function() {
         treasure = createTreasure();
         block_x = innerWidth / 2;
         block_y = innerHeight / 2;
         notFoundIt = true;
-    }, 2000);
+        startGame();
+    //}, 2000);
 }
 
 // TODO: place name from user input into cname value. will be able to save user info.
 
 
-function setCookie(cname, cvalue, exdays) {
-    var d = new Date();
-    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-    var expires = "expires="+d.toUTCString();
-    document.cookie = cname + "=" + cvalue + "; " + expires;
-}
-
-function getCookie(cname) {
-    var name = cname + "=";
-    var ca = document.cookie.split(';');
-    for(var i=0; i<ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0)==' ') c = c.substring(1);
-        if (c.indexOf(name) != -1) return c.substring(name.length,c.length);
-    }
-    return "";
-}
-
-function checkCookie() {
-    var user=getCookie("user");
-    if (user != "") {
-        alert("Welcome again " + user);
-    } else {
-        user = prompt("Please enter your name:","");
-        if (user != "" && user != null) {
-            setCookie("user", user, 30);
-        }
-    }
-}
+//function setCookie(cname, cvalue, exdays) {
+//    var d = new Date();
+//    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+//    var expires = "expires="+d.toUTCString();
+//    document.cookie = cname + "=" + cvalue + "; " + expires;
+//}
+//
+//function getCookie(cname) {
+//    var name = cname + "=";
+//    var ca = document.cookie.split(';');
+//    for(var i=0; i<ca.length; i++) {
+//        var c = ca[i];
+//        while (c.charAt(0)==' ') c = c.substring(1);
+//        if (c.indexOf(name) != -1) return c.substring(name.length,c.length);
+//    }
+//    return "";
+//}
+//
+//function checkCookie() {
+//    var user=getCookie("user");
+//    if (user != "") {
+//        alert("Welcome again " + user);
+//    } else {
+//        user = prompt("Please enter your name:","");
+//        if (user != "" && user != null) {
+//            setCookie("user", user, 30);
+//        }
+//    }
+//}
 
 function startGame(){
+    console.log('Starting game..')
+    if (!requestId) {
+        requestId = requestAnimationFrame(frame);
+    }
+}
 
+function stopGame(){
+    console.log('Stopping game..')
+    if (requestId){
+        window.cancelAnimationFrame(requestId);
+        requestId = undefined;
+    }
 }
