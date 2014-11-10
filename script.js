@@ -15,22 +15,48 @@ var block_h = 10;
 var block_w = 10;
 var treasure;
 var uLoc;
-var notFoundIt = false;
+var notFoundIt = true;
 var username;
 var bod = document.body;
+var score = 0;
+var q = window, uColor;
+var now, dt,
+    last = timestamp();
+requestAnimationFrame = q.requestAnimationFrame || q.webkitRequestAnimationFrame || q.msRequestAnimationFrame || q.mozRequestAnimationFrame;
 
 function init(){
-    canvas = document.getElementById("canvas");
+    canvas = document.getElementById('canvas');
     canvas.width = window.innerWidth - 16;
     canvas.height = window.innerHeight - 16;
     context = canvas.getContext('2d');
     treasure = createTreasure();
+
     w = canvas.width;
     h = canvas.height;
     block_x = w / 2 - 15;
     block_y = h /2 - 15;
 
-    var intervalId = setInterval('draw()', 25);
+    requestAnimationFrame(frame);
+}
+
+function run(){
+    value: false
+}
+
+
+function frame() {
+    if(run.value) {
+        now = timestamp();
+        dt = (now - last) / 1000;    // duration in seconds
+        draw(dt);
+        last = now;
+        requestAnimationFrame(frame);
+    }
+}
+
+
+function stopGame(){
+    run.value = !run.value;
 }
 
 function clearCanvas() {
@@ -70,14 +96,19 @@ function draw() {
     context.fillStyle="#3D3C3D";
     context.fill();
     uLoc = {x: block_x, y: block_y};
-    checkForWin();
 
-    if(!notFoundIt){
+    var relay = checkForWin();
+    if(relay == false){
         //if user has found it
         console.log(username + " found the treasure!");
-        notFoundIt = !notFoundIt;
+        ++score;
+        stopGame();
+        setTimeout(reset, 10000);
     }
+}
 
+function timestamp() {
+    return window.performance && window.performance.now ? window.performance.now() : new Date().getTime();
 }
 
 window.onkeydown = function (evt) {
@@ -148,8 +179,8 @@ function createTreasure(){
     treasure.width = 10;
     treasure.height = 10;
 
-    context.fillRect(treasure.x,treasure.y,block_w,block_h);
     context.fillStyle="#F2293A";
+    context.fillRect(treasure.x,treasure.y,block_w,block_h);
     context.fill();
     console.log(treasure);
     return treasure;
@@ -160,13 +191,15 @@ function randomize(min, max) {
 }
 
 function checkForWin(){
-    if (uLoc.x < treasure.x + treasure.width  && uLoc.x + treasure.width  > treasure.x &&
-        uLoc.y < treasure.y + treasure.height && uLoc.y + treasure.height > treasure.y) {
+    var relay;
+    if (uLoc.x < treasure.x -10 + treasure.width + 10  && uLoc.x + treasure.width + 10  > treasure.x - 10 &&
+        uLoc.y < treasure.y - 10 + treasure.height + 10 && uLoc.y + treasure.height + 10 > treasure.y - 10) {
 
     // The objects are touching
-        notFoundIt = !notFoundIt;
+        relay = !notFoundIt;
     }
-    // TODO: if (!notFoundIt) socket.emit user name to server, server broadcast checkForWin's name to all users
+    return relay;
+    // TODO: if (!notFoundIt) {socket.emit user name to server, server broadcast winner's name to all users}
 }
 
 // If the server broadcasts a win, reset the game
@@ -174,7 +207,7 @@ function checkForWin(){
 
 // After game over, server will emit the username to all users. browser will append name to users.
 
-function aWinner(user){
+function announceWinner(user){
     var u = user.toString();
     var x = document.createElement("p");
     var t = document.createTextNode(u + " is the checkForWin!");
@@ -184,9 +217,12 @@ function aWinner(user){
 
 function reset(){
     clearCanvas();
-    block_x = innerWidth/2;
-    block_y = innerHeight/2;
-
+    window.setTimeout(function() {
+        treasure = createTreasure();
+        block_x = innerWidth / 2;
+        block_y = innerHeight / 2;
+        notFoundIt = true;
+    }, 10000);
 }
 // TODO: place name from user input into cname value. will be able to save user info.
 
@@ -219,3 +255,5 @@ function checkCookie() {
         }
     }
 }
+
+function startGame(){}
