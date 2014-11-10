@@ -15,7 +15,9 @@ var block_h = 10;
 var block_w = 10;
 var treasure;
 var uLoc;
-var foundIt = false;
+var notFoundIt = false;
+var username;
+var bod = document.body;
 
 function init(){
     canvas = document.getElementById("canvas");
@@ -27,14 +29,13 @@ function init(){
     h = canvas.height;
     block_x = w / 2 - 15;
     block_y = h /2 - 15;
-    setInterval('draw()', 25);
 
+    var intervalId = setInterval('draw()', 25);
 }
 
 function clearCanvas() {
     context.clearRect(0,0,w,h);
 }
-
 
 function draw() {
     //clearCanvas();
@@ -69,13 +70,14 @@ function draw() {
     context.fillStyle="#3D3C3D";
     context.fill();
     uLoc = {x: block_x, y: block_y};
-    winner();
+    checkForWin();
 
-    if(foundIt){
-        console.log("You've found the treasure!");
-        foundIt = !foundIt;
+    if(!notFoundIt){
+        //if user has found it
+        console.log(username + " found the treasure!");
+        notFoundIt = !notFoundIt;
     }
-    //context.stroke();
+
 }
 
 window.onkeydown = function (evt) {
@@ -153,19 +155,67 @@ function createTreasure(){
     return treasure;
 }
 
-
 function randomize(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
 }
 
-function winner(){
-
+function checkForWin(){
     if (uLoc.x < treasure.x + treasure.width  && uLoc.x + treasure.width  > treasure.x &&
         uLoc.y < treasure.y + treasure.height && uLoc.y + treasure.height > treasure.y) {
 
     // The objects are touching
-        foundIt = true;
+        notFoundIt = !notFoundIt;
     }
-
+    // TODO: if (!notFoundIt) socket.emit user name to server, server broadcast checkForWin's name to all users
 }
 
+// If the server broadcasts a win, reset the game
+
+
+// After game over, server will emit the username to all users. browser will append name to users.
+
+function aWinner(user){
+    var u = user.toString();
+    var x = document.createElement("p");
+    var t = document.createTextNode(u + " is the checkForWin!");
+    x.appendChild(t);
+    bod.appendChild(x);
+}
+
+function reset(){
+    clearCanvas();
+    block_x = innerWidth/2;
+    block_y = innerHeight/2;
+
+}
+// TODO: place name from user input into cname value. will be able to save user info.
+
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    var expires = "expires="+d.toUTCString();
+    document.cookie = cname + "=" + cvalue + "; " + expires;
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1);
+        if (c.indexOf(name) != -1) return c.substring(name.length,c.length);
+    }
+    return "";
+}
+
+function checkCookie() {
+    var user=getCookie("username");
+    if (user != "") {
+        alert("Welcome again " + user);
+    } else {
+        user = prompt("Please enter your name:","");
+        if (user != "" && user != null) {
+            setCookie("username", user, 30);
+        }
+    }
+}
