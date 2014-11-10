@@ -2,6 +2,7 @@
  * Created by Isi on 11/8/14.
  */
 
+// TODO: initialize window size to
 var context;
 var canvas;
 var w, h;
@@ -16,12 +17,13 @@ var block_w = 10;
 var treasure;
 var uLoc;
 var notFoundIt = true;
-var username;
+// put the user received from regina's code
+var user = {name: null, color: null};
 var bod = document.body;
 var score = 0;
 var q = window, uColor;
-var now, dt,
-    last = timestamp();
+var now, dt, last = timestamp();
+
 requestAnimationFrame = q.requestAnimationFrame || q.webkitRequestAnimationFrame || q.msRequestAnimationFrame || q.mozRequestAnimationFrame;
 
 function init(){
@@ -40,18 +42,18 @@ function init(){
 }
 
 function run(){
-    value: false
+    value: true
 }
 
 
 function frame() {
-    if(run.value) {
+    //if(run.value) {
         now = timestamp();
         dt = (now - last) / 1000;    // duration in seconds
         draw(dt);
         last = now;
         requestAnimationFrame(frame);
-    }
+    //}
 }
 
 
@@ -64,7 +66,6 @@ function clearCanvas() {
 }
 
 function draw() {
-    //clearCanvas();
     if (rightKey) {
         block_x += 5;
     }
@@ -93,17 +94,22 @@ function draw() {
     //context.fillRect(block_x,block_y,block_w,block_h);
     context.beginPath();
     context.arc(block_x, block_y, block_w/3, 0, 2 * Math.PI, false);
-    context.fillStyle="#3D3C3D";
+    context.fillStyle="#3D3C3D"; // replace value with user.color;
     context.fill();
+    context.closePath();
+
     uLoc = {x: block_x, y: block_y};
 
     var relay = checkForWin();
+
     if(relay == false){
-        //if user has found it
-        console.log(username + " found the treasure!");
+        // If user has found it
+        announceWinner();
+        console.log(user + " found the treasure!");
         ++score;
-        stopGame();
-        setTimeout(reset, 10000);
+        //stopGame();
+        // wait 10 seconds and then reset
+        setTimeout(reset, 5000);
     }
 }
 
@@ -180,9 +186,10 @@ function createTreasure(){
     treasure.height = 10;
 
     context.fillStyle="#F2293A";
-    context.fillRect(treasure.x,treasure.y,block_w,block_h);
+    context.fillRect(treasure.x, treasure.y, block_w, block_h);
     context.fill();
-    console.log(treasure);
+
+    console.log('The treasure location = ( x: ' + treasure.x + ", y: " + treasure.y + ")");
     return treasure;
 }
 
@@ -205,26 +212,40 @@ function checkForWin(){
 // If the server broadcasts a win, reset the game
 
 
-// After game over, server will emit the username to all users. browser will append name to users.
+// After game over, server will emit the user to all users. browser will append name to users.
 
 function announceWinner(user){
-    var u = user.toString();
-    var x = document.createElement("p");
-    var t = document.createTextNode(u + " is the checkForWin!");
-    x.appendChild(t);
-    bod.appendChild(x);
+    clearCanvas();
+    //var u = user.name.toString();
+    //var u = user.toString();
+
+    //var x = document.createElement("p");
+    //var t = document.createTextNode(u + " is the checkForWin!");
+
+    //x.appendChild(t);
+    //bod.appendChild(x);
+
+
+        context.font="100px Georgia";
+        context.fillText("Game OVER", ((canvas.height/2) - 40), (canvas.height/2));
+        //context.fillText(" is the checkForWin!");
+
+
 }
 
 function reset(){
-    clearCanvas();
+    // wait 2 seconds then:
     window.setTimeout(function() {
+        clearCanvas();
         treasure = createTreasure();
         block_x = innerWidth / 2;
         block_y = innerHeight / 2;
         notFoundIt = true;
-    }, 10000);
+    }, 2000);
 }
+
 // TODO: place name from user input into cname value. will be able to save user info.
+
 
 function setCookie(cname, cvalue, exdays) {
     var d = new Date();
@@ -245,15 +266,17 @@ function getCookie(cname) {
 }
 
 function checkCookie() {
-    var user=getCookie("username");
+    var user=getCookie("user");
     if (user != "") {
         alert("Welcome again " + user);
     } else {
         user = prompt("Please enter your name:","");
         if (user != "" && user != null) {
-            setCookie("username", user, 30);
+            setCookie("user", user, 30);
         }
     }
 }
 
-function startGame(){}
+function startGame(){
+
+}
