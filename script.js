@@ -10,6 +10,7 @@ var rightKey = false;
 var leftKey = false;
 var upKey = false;
 var downKey = false;
+var block = {x: null, y: null, h: null, w: null};
 var block_x;
 var block_y;
 var block_h = 10;
@@ -83,9 +84,9 @@ function draw() {
     if(relay == false){
         // If user has found it
         stopGame();
-        announceWinner();
-        console.log(user + " found the treasure!");
-        ++score;
+        //announceWinner();
+        console.log(user.name + " found the treasure!");
+        //++score;
         //stopGame();
         // wait 10 seconds and then reset
         //setTimeout(reset, 5000);
@@ -294,15 +295,16 @@ function reset(){
 
 function startGame(){
     console.log('Starting game..')
-    if (!requestId) {
+    //if (!requestId) {
         requestId = requestAnimationFrame(frame);
-    }
+    //}
 }
 
 function stopGame(){
-    console.log('Stopping game..')
-    if (requestId){
+
+    //if (requestId){
+        console.log('Stopping game..')
         window.cancelAnimationFrame(requestId);
         requestId = undefined;
-    }
+    //}
 }
