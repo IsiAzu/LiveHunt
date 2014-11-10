@@ -1,0 +1,105 @@
+<html>
+	<head>
+		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.js"></script>
+
+
+
+		
+		<script type="text/javascript">
+		
+			var socket = io.connect('http://104.131.38.187:8080/');
+			
+			socket.on('connect', function() {
+				console.log("Connected");
+				console.log("Color");
+			});
+
+			// Receive from any event
+			socket.on('chatmessage', function (data) {
+				console.log(data);
+				document.getElementById('messages').innerHTML = "" + data + 
+ + "" + document.getElementById('messages').innerHTML;
+			});
+
+			socket.on('typename', function (data){
+				console.log(data);
+				document.getElementById('typename').innerHTML = "aa";
+			});
+			
+			var sendmessage = function(message) {
+
+				col = message;
+				$('#rect').css('background-color',''+ message);
+				$('#rect').show();
+ 				$('#rect').css("display:inline");
+
+				console.log("chatmessage: " + message);
+				socket.emit('chatmessage', message);
+			
+				
+			};
+
+			var typename = function(name){
+				console.log('ll');
+				socket.emit('typename' ,name);
+			}
+		
+	
+			var canvas;
+			var context;
+			//var col = '#ffffff';
+
+		window.addEventListener('load', function() {
+			canvas = document.getElementById('mycanvas');			
+			context = canvas.getContext('2d');
+			
+			// context.fillStyle="#ffffff";
+			console.log("Color");
+			
+				
+			
+		});
+		</script>		
+		
+	</head>
+ <body>
+ <div id="messages">
+type your color     Type your name
+ </div>
+<!-- <div id="messages">
+type your name
+ </div> -->
+ <p>
+ <input type="text" id="message" name="message">
+
+ <input type="submit" value="submit" onclick="sendmessage(document.getElementById('message').value);">
+ 
+ <input type="text" id="name" name="message">
+ 
+ <input type="submit" value="submit" onclick="typename(document.getElementById('name').value);">
+
+ <div id="rect">
+
+ </div>
+ <div id="typename">
+
+</div>
+
+</p> 
+<p>
+ <canvas width="1200" height="600" id="mycanvas"/>
+ </canvas>
+ </p>
+ 
+ </body>
+
+	<style type="text/css">
+		#rect{
+			margin-top:100px;
+			width: 300px;
+			height: 300px;
+			color: blue;
+		}
+		</style>
+</html>
