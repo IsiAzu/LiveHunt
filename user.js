@@ -97,7 +97,7 @@ var update = function(){
     //console.log("trying to update");
     ////  ASSUMING LANDSCAPE, HOME BUTTON ON LEFT  ////
     ////  Tilt left, go left  ////
-if ( this.val.b > 0 || this.val.g > 0) {
+//if ( this.val.b > 0 || this.val.g > 0) {
 //    console.log("moving");
     if (this.val.b > 0) {
         //console.log('moving right...');
@@ -124,6 +124,7 @@ if ( this.val.b > 0 || this.val.g > 0) {
         //console.log('moving down...');
         this.block.y += 5;
     }
+
     if (this.block.y <= 0) {
         this.block.y = 0;
     }
@@ -136,7 +137,7 @@ if ( this.val.b > 0 || this.val.g > 0) {
     if ((this.block.y + this.block.h) >= h) {
         this.block.y = h - this.block.h;
     }
-}
+//}
 };
 
 var display = function(){
@@ -157,12 +158,15 @@ var display = function(){
 };
 
 var sendData = function(){
-    return [
-        this.block,
-        this.user
-    ];
-    //return JSON.stringify(this.data);
+
+    var dat = [{
+        drawValues: this.block,
+        userValues: this.user
+    }];
+    return JSON.stringify(dat);
 };
+
+
 
 ////////////////////////////////////////////////////
 
@@ -246,13 +250,4 @@ function timestamp() {
 }
 
 
-//var users = [
-//    user1{
-//        socketId
-//    },
-//    user2
-//];
-//
-//for( var i = 0; i < users.length; i++){
-//    var ouser = new userParticle( prizeLocation, users[i], document.body, "socketID", context, val);
-//}
+
