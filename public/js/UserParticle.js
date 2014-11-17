@@ -4,7 +4,7 @@
 
 var myId, w, h;
 var canvas, two, rotate = false;
-var userclass;
+var userclass, newData;
 var val = {
     x: 0,
     y: 0
@@ -14,6 +14,15 @@ var val = {
 //    y: 0
 //};
 
+////////////////////////////////////////////////////////////////////////////////
+///////////////////////////     SOCKET SECTION   ///////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+///////////////////////     CANVAS DRAWING SECTION   ///////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 requestAnimationFrame =  window.requestAnimationFrame ||
 window.webkitRequestAnimationFrame ||
@@ -80,25 +89,13 @@ function init() {
         userclass.seek(target);
         userclass.update();
         userclass.display();
+        newData = userclass.emitData();
 
         requestAnimationFrame(render);
     };
-    requestAnimationFrame(render);
+    render();
 }
 
-
-window.ondeviceorientation = function (evt) {
-    if (!evt) {
-        evt = window.event;
-    }
-    rotate = true;
-    val.x = evt.beta;
-    val.y = evt.gamma;
-
-    // Calibration. Invert Y value so UserParticle follows direction correctly
-    val.y *= -1;
-    //map.innerHTML ="Beta: x: " + Math.floor(evt.beta) + "  /  Gamma: y: " + Math.floor(evt.gamma);
-};
 
 function UserParticle(x,y) {
     var accVec, steerVec, desiredVec, theta;
@@ -167,7 +164,7 @@ function UserParticle(x,y) {
 
     this.display = function () {
         // Get value of rotation ( in radians );
-        this.theta = Math.atan2(this.vel[1], this.vel[0]);
+        theta = Math.atan2(this.vel[1], this.vel[0]);
         //console.log(theta);
 
 
@@ -181,7 +178,7 @@ function UserParticle(x,y) {
         // Check if device is moving
         if (rotate == true){
             // On Device movement, rotate my object ( by radians NOT degree ).
-            this.rect.rotation = this.theta;
+            this.rect.rotation = theta;
         }
     };
 
@@ -198,14 +195,16 @@ function UserParticle(x,y) {
 
     this.emitData = function () {
         // I need to emit my x & y values, boolean rotation, theta for rotation,
-        // boolean for finding treasure,
-        return{
+        // boolean for finding treasure
+        var d = {
             x: this.pos[0],
             y: this.pos[1],
             r: rotate,
-            theta: theta,
-            color: "red"
-        }
+            t: theta,
+            c: "red"
+        };
+        console.log ("User Info: " + d.toString());
+        return JSON.stringify(d);
     }
 }
 
