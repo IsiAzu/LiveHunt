@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-var debug = require('debug')('http');
+var debug = require('debug')('LiveHunt');
 var app = require('../app');
 //require('../sockets/base')(io);
 
@@ -16,7 +16,7 @@ var io = require('socket.io')(server);
 var clients = [];
 
 var er =
-server.listen(app.get('port'), function(){
+server.listen(app.get('port'), 'localhost', function(){
   debug('Express server listening on port ' + er.address().port);
   console.log('listening on *:3000');
 });
