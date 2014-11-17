@@ -61,7 +61,6 @@ html
         val.y = evt.gamma;
                 // Calibration. Invert Y value so UserParticle follows direction correctly
         val.y *= -1;
-        socket.emit('positionChange', newData);
       };
 
   body(onload="init();", style="background: black")

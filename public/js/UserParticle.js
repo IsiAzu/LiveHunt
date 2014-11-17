@@ -130,6 +130,10 @@ function UserParticle(x,y) {
 
         this.acc = accVec;
 
+        if(emit){
+
+        }
+
     };
 
     this.seek = function (target) {
