@@ -16,7 +16,7 @@ cd livehunt && npm install $$ bower install
 Run server with `node www.js`.
 
 Go to [http://localhost:3000] from your phone browser. Rotate device to control the ball.
-
+nn
 <br>
 ##How to play:
 
