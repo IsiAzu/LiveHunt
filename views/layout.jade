@@ -3,17 +3,25 @@ html
   head
     title= title
 
-    script(type="text/javascript", src="./js/UserParticle.js")
+    script(type="text/javascript", src="/js/UserParticle.js")
     script(type="text/javascript", src="/socket.io/socket.io.js")
     script(type="text/javascript", src="/bower_components/gl-matrix/dist/gl-matrix.js")
     script(type="text/javascript", src="//cdnjs.cloudflare.com/ajax/libs/two.js/0.4.0/two.min.js")
     script.
+
+      ////////////////////////////////////////////////////////////////////////////////
+      ///////////////////////////     SOCKET SECTION   ///////////////////////////////
+      ////////////////////////////////////////////////////////////////////////////////
+
       var clients = [];
       var users = [];
+
             ////  SOCKETS ON  ////
       var socket = io.connect('/');
+
       socket.on('connect', function () {
                 ////  SHOW MY CONNECTION  ////
+
         var sessionid = socket.io.engine.id;
         console.log("User Connected: " + sessionid);
           //userList.innerHTML = sessionid;
@@ -22,45 +30,50 @@ html
 
             ////  GET OTHER USERS ORIENTATION VALUES  ////
       socket.on('positionChangeServer', function (clientvals) {
-        var parsed = JSON.parse(clientvals);
+        var parsed = JSON.parse(clientvals[1]);
         var clientid = clientvals[0];
-          //console.log("*****" + clientid);
+        console.log("incoming: " + parsed);
         var exists = -1;
+
         for (var i = 0; i < clients.length; i++) {
-              //console.log("does " + clients[i] + " = " + clientid);
+
           if (clientid == clients[i]) {
             exists = i;
             break;
           }
         }
+
         if (exists == -1) {
-              //if (! (clientid in clients)) {
+
           clients.push(clientid);
-          var newuser = new UserParticle(parsed[1].x, parsed[1].y);
+
+          var newuser = new UserParticle(parsed[0].x, parsed[0].y);
+
           users.push(newuser);
-          var userRect = new two.makeRectangle(parsed[1].x, parsed[1].y, 18, 8);
-          newuser.displayOthers(parsed[1].x, parsed[1].y, parsed[1].r, parsed[1].t, parsed[1].c, userRect);
-              // console.log(newuser.color);
-              //newuser.run(parsed[0].x, parsed[0].y);
-              // console.log(clientid);
+          newuser.displayOthers(parsed[0].x, parsed[0].y, parsed[0].r, parsed[0].t, parsed[0].c);
+
         } else {
-              //console.log("user exists" + exists);
+
           var currentuser = users[exists];
-              //currentuser.run(parsed[0].x,parsed[0].y);
-          currentuser.pos.x = parsed[1].x;
-          currentuser.pos.y = parsed[1].y;
-          currentuser.displayOthers(parsed[1].x, parsed[1].y, parsed[1].r, parsed[1].t, parsed[1].c);
+
+          currentuser.pos.x = parsed[0].x;
+          currentuser.pos.y = parsed[0].y;
+
+          currentuser.displayOthers(parsed[0].x, parsed[0].y, parsed[0].r, parsed[0].t, parsed[0].c);
         }
       });
+
       window.ondeviceorientation = function (evt) {
         if (!evt) {
           evt = window.event;
         }
-        rotate = true;
-        val.x = evt.beta;
-        val.y = evt.gamma;
+
+         // rotate = true;
+          val.x = evt.beta;
+          val.y = evt.gamma;
                 // Calibration. Invert Y value so UserParticle follows direction correctly
-        val.y *= -1;
+          val.y *= -1;
+          socket.emit('positionChange', newData);
       };
 
   body(onload="init();", style="background: black")

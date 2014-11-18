@@ -9,14 +9,9 @@ var val = {
     x: 0,
     y: 0
 };
-//var mousePos = {
-//    x: 0,
-//    y: 0
-//};
 
-////////////////////////////////////////////////////////////////////////////////
-///////////////////////////     SOCKET SECTION   ///////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
+
+
 
 
 
@@ -28,6 +23,8 @@ requestAnimationFrame =  window.requestAnimationFrame ||
 window.webkitRequestAnimationFrame ||
 window.msRequestAnimationFrame ||
 window.mozRequestAnimationFrame;
+
+lockOrientation = screen.lockOrientation || screen.mozLockOrientation || screen.msLockOrientation;
 
 function init() {
 
@@ -57,42 +54,48 @@ function init() {
     userclass = new UserParticle(w/2, h/2);
 
     var target;
-    var render = function () {
-        //canvas.width = window.innerWidth - 16;
+    //if (lockOrientation("landscape-primary")) {
+    //    console.log("orientation was locked");
 
-        target = vec2.create();
+        var render = function () {
+            //canvas.width = window.innerWidth - 16;
 
-        // Limit accelerometer x values to (-30, 30) & y values (-20, 20) range
-        if(val.x > 30){
-            val.x = 30
-        } else if(val.x < -30){
-            val.x = -30;
-        }
+            target = vec2.create();
 
-        if(val.y > 20){
-            val.y = 20
-        } else if(val.y < -20){
-            val.y = -20
-        }
+            // Limit accelerometer x values to (-30, 30) & y values (-20, 20) range
+            if (val.x > 30) {
+                val.x = 30
+            } else if (val.x < -30) {
+                val.x = -30;
+            }
 
-        // Map values
-        var mappedVal = pamVector(val, accelHigh, accelLow, pageHigh, pageLow);
+            if (val.y > 20) {
+                val.y = 20
+            } else if (val.y < -20) {
+                val.y = -20
+            }
 
-        // Set mapped values into target vector
-        vec2.set(target, mappedVal.x, mappedVal.y);
+            // Map values
+            var mappedVal = pamVector(val, accelHigh, accelLow, pageHigh, pageLow);
 
-        //var m = vec2.create();
-        //vec2.set(m, mousePos.x, mousePos.y);
-        //mouse.innerHTML = 'Mouse: ' + vec2.str(m);
-        //console.log('mouse: ' + vec2.str(m));
+            // Set mapped values into target vector
+            vec2.set(target, mappedVal.x, mappedVal.y);
 
-        userclass.seek(target);
-        userclass.update();
-        userclass.display();
-        newData = userclass.emitData();
+            //var m = vec2.create();
+            //vec2.set(m, mousePos.x, mousePos.y);
+            //mouse.innerHTML = 'Mouse: ' + vec2.str(m);
+            //console.log('mouse: ' + vec2.str(m));
 
-        requestAnimationFrame(render);
-    };
+            userclass.seek(target);
+            userclass.update();
+            userclass.display();
+            newData = userclass.emitData();
+
+            requestAnimationFrame(render);
+        };
+    //} else {
+        //console.log("orientation lock failed");
+    //}
     render();
 }
 
@@ -130,10 +133,9 @@ function UserParticle(x,y) {
 
         this.acc = accVec;
 
-        if(emit){
-
-        }
-
+        //if(emit){
+        //
+        //}
     };
 
     this.seek = function (target) {
@@ -174,7 +176,7 @@ function UserParticle(x,y) {
 
         //draw a rectangle inside canvas
 
-        this.rect.fill = 'orange';
+        this.rect.fill = 'yellow';
         this.rect.noStroke();
         //this.rect.rotation(1);
         this.rect.translation.set(this.pos[0], this.pos[1]);
@@ -186,28 +188,33 @@ function UserParticle(x,y) {
         }
     };
 
-    this.displayOthers = function(PosXval, PosYval, r, theta, color, uRect) {
-        uRect.fill = color;
-        uRect.noStroke();
-        uRect.translation.set(PosXval, PosYval);
+    this.displayOthers = function(PosXval, PosYval, r, theta, color) {
+        this.rect.fill = color;
+        this.rect.scale =
+        this.rect.noStroke();
+        this.rect.translation.set(PosXval, PosYval);
 
         // check if rotate boolean is true. If true, replace rotation value with theta construct
         if (r == true){
-            uRect.rotation = theta;
+            this.rect.rotation = theta;
         }
     };
 
     this.emitData = function () {
         // I need to emit my x & y values, boolean rotation, theta for rotation,
-        // boolean for finding treasure
-        var d = {
-            x: this.pos[0],
-            y: this.pos[1],
-            r: rotate,
-            t: theta,
-            c: "red"
-        };
-        console.log ("User Info: " + d.toString());
+        // boolean for
+        var r;
+        var d = [
+            r = {
+                x: this.pos[0],
+                y: this.pos[1],
+                r: rotate,
+                t: theta,
+                c: 'red'
+            }
+        ];
+
+        //console.log ("User Info: " + JSON.stringify(d));
         return JSON.stringify(d);
     }
 }

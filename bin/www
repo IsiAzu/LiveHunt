@@ -22,19 +22,16 @@ server.listen(app.get('port'), function(){
 });
 
 io.sockets.on('connection', function(socket){
-  console.log('a user connected' + socket.id);
+  console.log(socket.id + ' just connected' );
   clients.push(socket.id);
-  console.log(clients);
+  //console.log(clients);
 
-  io.emit('clientList', clients);
+  io.emit('client', socket.id);
 
-  //socket.emit('info', {msg: 'The world is round, there is no up or down.' });
   socket.on('positionChange', function(data){
-
     var clientvals = [socket.id, data];
     console.log("Client Values: " + clientvals);
     socket.broadcast.emit('positionChangeServer', clientvals);
-    //socket.broadcast.emit('chat message', data);
   });
 
   socket.on('disconnect()', function(){
