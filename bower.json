@@ -1,0 +1,21 @@
+{
+  "name": "LiveHunt",
+  "version": "0.0.0",
+  "homepage": "https://github.com/IsiAzu/LiveHunt",
+  "authors": [
+    "Isi <ioa213@nyu.edu>"
+  ],
+  "description": "Online treasure hunt",
+  "main": "bin/www.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "gl-matrix": "~2.2.1"
+  }
+}
